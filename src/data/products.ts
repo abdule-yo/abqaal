@@ -1,0 +1,68 @@
+import { Product } from '@/types'
+
+export const products: Product[] = [
+  {
+    id: 'seeds-vegetable',
+    name: 'Vegetable Seeds',
+    description: 'High-quality vegetable seeds including tomato, pepper, onion, lettuce, and more — sourced from certified suppliers.',
+    category: 'Seeds',
+    image: '/images/products/seeds.jpg',
+    featured: true,
+  },
+  {
+    id: 'fertilizers-npk',
+    name: 'NPK Fertilizers',
+    description: 'Balanced NPK fertilizers for optimal crop nutrition and soil health improvement.',
+    category: 'Fertilizers',
+    image: '/images/products/fertilizers.jpg',
+    featured: true,
+  },
+  {
+    id: 'greenhouse-kit',
+    name: 'Greenhouse Kits',
+    description: 'Complete greenhouse kits including structure, covering material, and ventilation systems.',
+    category: 'Greenhouses',
+    image: '/images/products/greenhouse.jpg',
+    featured: true,
+  },
+  {
+    id: 'drip-irrigation',
+    name: 'Drip Irrigation Systems',
+    description: 'Water-efficient drip irrigation systems suitable for various crop types and farm sizes.',
+    category: 'Irrigation Equipment',
+    image: '/images/products/irrigation.jpg',
+    featured: true,
+  },
+  {
+    id: 'hand-tools',
+    name: 'Farm Hand Tools',
+    description: 'Durable hand tools including hoes, shovels, rakes, and pruning equipment.',
+    category: 'Hand Tools',
+    image: '/images/products/tools.jpg',
+    featured: false,
+  },
+  {
+    id: 'pesticides',
+    name: 'Plant Protection Products',
+    description: 'Certified pesticides, herbicides, and fungicides for effective crop protection.',
+    category: 'Plant Protection',
+    image: '/images/products/protection.jpg',
+    featured: false,
+  },
+  {
+    id: 'farm-machinery',
+    name: 'Farm Machinery',
+    description: 'Tractors, tillers, harvesters, and other farm machinery for mechanized farming.',
+    category: 'Farm Machinery',
+    image: '/images/products/machinery.jpg',
+    featured: false,
+  },
+  {
+    id: 'dam-liners',
+    name: 'Geo-membrane & Dam Liners',
+    description: 'High-quality geo-membrane and dam liners for water storage and conservation.',
+    category: 'Geo-membrane & Dam Liners',
+    image: '/images/products/liners.jpg',
+    featured: true,
+  },
+]
