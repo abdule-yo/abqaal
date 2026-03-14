@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { NAV_LINKS } from '@/lib/constants'
-import { ChevronDown } from 'lucide-react'
 
 interface NavLinksProps {
   pathname: string
@@ -12,14 +11,13 @@ export default function NavLinks({ pathname, isScrolled }: NavLinksProps) {
     <ul className="flex items-center gap-2">
       {NAV_LINKS.map((link) => {
         const isActive =
-          pathname === link.href ||
-          (link.href !== '/' && pathname.startsWith(link.href))
+          pathname === link.href || pathname.startsWith(link.href)
 
         return (
           <li key={link.href}>
             <Link
               href={link.href}
-              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-[15px] font-medium rounded-full transition-all duration-300 ${
+              className={`inline-flex items-center px-5 py-2.5 text-[15px] font-medium rounded-full transition-all duration-300 ${
                 isActive
                   ? 'text-[#C5E84D]'
                   : isScrolled
@@ -28,7 +26,6 @@ export default function NavLinks({ pathname, isScrolled }: NavLinksProps) {
               }`}
             >
               {link.label}
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isActive ? 'opacity-100' : 'opacity-60'}`} />
             </Link>
           </li>
         )

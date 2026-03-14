@@ -4,7 +4,10 @@ export interface Product {
   description: string
   category: string
   image: string
+  price: string
   featured: boolean
+  slug: string
+  highlights: string[]
 }
 
 export interface Service {
@@ -14,17 +17,23 @@ export interface Service {
   icon: string
   features: string[]
   image: string
+  slug: string
 }
 
 export interface Project {
   id: string
+  slug: string
   title: string
   description: string
+  longDescription: string
   location: string
   partner: string
   images: string[]
   year: number
   category: string
+  impact: string[]
+  duration: string
+  status: 'Completed' | 'Ongoing' | 'Upcoming'
 }
 
 export interface TeamMember {

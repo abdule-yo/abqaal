@@ -11,13 +11,10 @@ export const COMPANY = {
 } as const
 
 export const NAV_LINKS = [
-  { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
   { label: 'Products', href: '/products' },
   { label: 'Services', href: '/services' },
   { label: 'Projects', href: '/projects' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Contact', href: '/contact' },
 ] as const
 
 export const SERVICE_CATEGORIES = [

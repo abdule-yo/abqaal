@@ -63,7 +63,7 @@ export default function ProductCategoryCard({
           </p>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C5E84D] hover:bg-[#b8d944] text-[#1A1A17] text-sm font-semibold rounded-full transition-all duration-300 hover:scale-[1.03]"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-[#4A8B2C]/25"
           >
             More View
             <ArrowUpRight className="h-3.5 w-3.5" />

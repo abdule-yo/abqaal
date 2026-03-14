@@ -26,7 +26,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
           <SheetTitle className="text-left">
             <Link href="/" onClick={onClose} className="flex items-center gap-2">
               <Image
-                src="/logo.png"
+                src="/logo-transparent.png"
                 alt={COMPANY.shortName}
                 width={32}
                 height={32}
@@ -43,8 +43,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
           <ul className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const isActive =
-                pathname === link.href ||
-                (link.href !== '/' && pathname.startsWith(link.href))
+                pathname === link.href || pathname.startsWith(link.href)
 
               return (
                 <li key={link.href}>
