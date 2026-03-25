@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { DeleteButton } from '../projects/delete-button'
+import { getCurrentAdmin, canCreate, canEdit, canDelete } from '@/lib/auth'
 import type { Database } from '@/types/database'
 
 type Product = Database['public']['Tables']['products']['Row']
@@ -14,6 +15,8 @@ export default async function DashboardProductsPage() {
     .order('created_at', { ascending: false })
 
   const products = (data ?? []) as Product[]
+  const admin = await getCurrentAdmin()
+  const role = admin?.role ?? 'editor'
 
   return (
     <div>
@@ -24,13 +27,15 @@ export default async function DashboardProductsPage() {
             {products.length} products
           </p>
         </div>
-        <Link
-          href="/dashboard/products/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A17] hover:bg-[#111110] text-white text-sm font-semibold rounded-full transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          New Product
-        </Link>
+        {canCreate(role) && (
+          <Link
+            href="/dashboard/products/new"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A17] hover:bg-[#111110] text-white text-sm font-semibold rounded-full transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New Product
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-[#E8E8E0] overflow-hidden">
@@ -69,13 +74,17 @@ export default async function DashboardProductsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/dashboard/products/${product.id}/edit`}
-                          className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
-                        >
-                          Edit
-                        </Link>
-                        <DeleteButton id={product.id} type="products" />
+                        {canEdit(role) && (
+                          <Link
+                            href={`/dashboard/products/${product.id}/edit`}
+                            className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
+                          >
+                            Edit
+                          </Link>
+                        )}
+                        {canDelete(role) && (
+                          <DeleteButton id={product.id} type="products" />
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -86,13 +95,15 @@ export default async function DashboardProductsPage() {
         ) : (
           <div className="text-center py-16">
             <p className="text-[#1A1A17]/40 text-sm">No products yet</p>
-            <Link
-              href="/dashboard/products/new"
-              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#1A1A17] text-white text-sm font-semibold rounded-full"
-            >
-              <Plus className="h-4 w-4" />
-              Create First Product
-            </Link>
+            {canCreate(role) && (
+              <Link
+                href="/dashboard/products/new"
+                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#1A1A17] text-white text-sm font-semibold rounded-full"
+              >
+                <Plus className="h-4 w-4" />
+                Create First Product
+              </Link>
+            )}
           </div>
         )}
       </div>

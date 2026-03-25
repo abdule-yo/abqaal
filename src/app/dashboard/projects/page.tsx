@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Plus, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { DeleteButton } from './delete-button'
+import { getCurrentAdmin, canCreate, canEdit, canDelete } from '@/lib/auth'
 import type { Database } from '@/types/database'
 
 type Project = Database['public']['Tables']['projects']['Row']
@@ -14,6 +15,8 @@ export default async function DashboardProjectsPage() {
     .order('created_at', { ascending: false })
 
   const projects = (data ?? []) as Project[]
+  const admin = await getCurrentAdmin()
+  const role = admin?.role ?? 'editor'
 
   return (
     <div>
@@ -24,13 +27,15 @@ export default async function DashboardProjectsPage() {
             {projects.length} projects
           </p>
         </div>
-        <Link
-          href="/dashboard/projects/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          New Project
-        </Link>
+        {canCreate(role) && (
+          <Link
+            href="/dashboard/projects/new"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New Project
+          </Link>
+        )}
       </div>
 
       {/* Table */}
@@ -76,13 +81,17 @@ export default async function DashboardProjectsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/dashboard/projects/${project.id}/edit`}
-                          className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
-                        >
-                          Edit
-                        </Link>
-                        <DeleteButton id={project.id} type="projects" />
+                        {canEdit(role) && (
+                          <Link
+                            href={`/dashboard/projects/${project.id}/edit`}
+                            className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
+                          >
+                            Edit
+                          </Link>
+                        )}
+                        {canDelete(role) && (
+                          <DeleteButton id={project.id} type="projects" />
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -93,13 +102,15 @@ export default async function DashboardProjectsPage() {
         ) : (
           <div className="text-center py-16">
             <p className="text-[#1A1A17]/40 text-sm">No projects yet</p>
-            <Link
-              href="/dashboard/projects/new"
-              className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#4A8B2C] text-white text-sm font-semibold rounded-full"
-            >
-              <Plus className="h-4 w-4" />
-              Create First Project
-            </Link>
+            {canCreate(role) && (
+              <Link
+                href="/dashboard/projects/new"
+                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#4A8B2C] text-white text-sm font-semibold rounded-full"
+              >
+                <Plus className="h-4 w-4" />
+                Create First Project
+              </Link>
+            )}
           </div>
         )}
       </div>

@@ -2,11 +2,14 @@ import Link from 'next/link'
 import { Plus, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { DeleteButton } from '../projects/delete-button'
+import { getCurrentAdmin, canCreate, canEdit, canDelete } from '@/lib/auth'
 import type { Database } from '@/types/database'
 
 type Testimonial = Database['public']['Tables']['testimonials']['Row']
 
 export default async function TestimonialsPage() {
+  const admin = await getCurrentAdmin()
+  const role = admin?.role ?? 'editor'
   const supabase = await createClient()
   const { data: testimonials } = await supabase
     .from('testimonials')
@@ -22,13 +25,15 @@ export default async function TestimonialsPage() {
             Manage client testimonials shown on the homepage
           </p>
         </div>
-        <Link
-          href="/dashboard/testimonials/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          New Testimonial
-        </Link>
+        {canCreate(role) && (
+          <Link
+            href="/dashboard/testimonials/new"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New Testimonial
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-[#E8E8E0] overflow-hidden">
@@ -67,13 +72,17 @@ export default async function TestimonialsPage() {
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Link
-                      href={`/dashboard/testimonials/${t.id}/edit`}
-                      className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
-                    >
-                      Edit
-                    </Link>
-                    <DeleteButton id={t.id} type="testimonials" />
+                    {canEdit(role) && (
+                      <Link
+                        href={`/dashboard/testimonials/${t.id}/edit`}
+                        className="px-3 py-1.5 text-xs font-medium text-[#4A8B2C] hover:bg-[#E8F5E9] rounded-lg transition-colors"
+                      >
+                        Edit
+                      </Link>
+                    )}
+                    {canDelete(role) && (
+                      <DeleteButton id={t.id} type="testimonials" />
+                    )}
                   </div>
                 </td>
               </tr>

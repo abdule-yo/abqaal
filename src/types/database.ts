@@ -225,11 +225,44 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_users: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          email: string
+          name: string
+          role: 'super_admin' | 'admin' | 'editor'
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          email: string
+          name?: string
+          role?: 'super_admin' | 'admin' | 'editor'
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          updated_at?: string
+          user_id?: string
+          email?: string
+          name?: string
+          role?: 'super_admin' | 'admin' | 'editor'
+          created_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
     Enums: {
       project_status: 'Completed' | 'Ongoing' | 'Upcoming'
+      admin_role: 'super_admin' | 'admin' | 'editor'
     }
     CompositeTypes: Record<string, never>
   }

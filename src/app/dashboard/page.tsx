@@ -1,8 +1,11 @@
 import Link from 'next/link'
-import { FolderKanban, Package, Tag, ImageIcon, MessageSquareQuote, ArrowUpRight } from 'lucide-react'
+import { FolderKanban, Package, Tag, ImageIcon, MessageSquareQuote, ArrowUpRight, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentAdmin, canCreate, canManageUsers, getRoleLabel } from '@/lib/auth'
 
 export default async function DashboardPage() {
+  const admin = await getCurrentAdmin()
+  const role = admin?.role ?? 'editor'
   const supabase = await createClient()
 
   const [
@@ -91,38 +94,56 @@ export default async function DashboardPage() {
 
       {/* Quick actions */}
       <div>
-        <h2 className="text-sm font-bold text-[#1A1A17]/50 mb-4">Quick Actions</h2>
+        <h2 className="text-sm font-bold text-[#1A1A17]/50 mb-4">
+          Quick Actions
+          <span className="ml-2 text-xs font-normal text-[#1A1A17]/30">
+            ({getRoleLabel(role)})
+          </span>
+        </h2>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard/projects/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
-          >
-            New Project
-          </Link>
-          <Link
-            href="/dashboard/products/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A17] hover:bg-[#111110] text-white text-sm font-semibold rounded-full transition-colors"
-          >
-            New Product
-          </Link>
-          <Link
-            href="/dashboard/categories/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2196F3] hover:bg-[#1976D2] text-white text-sm font-semibold rounded-full transition-colors"
-          >
-            New Category
-          </Link>
-          <Link
-            href="/dashboard/testimonials/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E65100] hover:bg-[#BF360C] text-white text-sm font-semibold rounded-full transition-colors"
-          >
-            New Testimonial
-          </Link>
-          <Link
-            href="/dashboard/settings"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[#E8E8E0] hover:border-[#4A8B2C]/20 text-[#1A1A17]/60 text-sm font-semibold rounded-full transition-colors"
-          >
-            Edit Hero Stats
-          </Link>
+          {canCreate(role) && (
+            <>
+              <Link
+                href="/dashboard/projects/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white text-sm font-semibold rounded-full transition-colors"
+              >
+                New Project
+              </Link>
+              <Link
+                href="/dashboard/products/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A17] hover:bg-[#111110] text-white text-sm font-semibold rounded-full transition-colors"
+              >
+                New Product
+              </Link>
+              <Link
+                href="/dashboard/categories/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2196F3] hover:bg-[#1976D2] text-white text-sm font-semibold rounded-full transition-colors"
+              >
+                New Category
+              </Link>
+              <Link
+                href="/dashboard/testimonials/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E65100] hover:bg-[#BF360C] text-white text-sm font-semibold rounded-full transition-colors"
+              >
+                New Testimonial
+              </Link>
+              <Link
+                href="/dashboard/settings"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[#E8E8E0] hover:border-[#4A8B2C]/20 text-[#1A1A17]/60 text-sm font-semibold rounded-full transition-colors"
+              >
+                Edit Hero Stats
+              </Link>
+            </>
+          )}
+          {canManageUsers(role) && (
+            <Link
+              href="/dashboard/users/new"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-full transition-colors"
+            >
+              <Users className="h-3.5 w-3.5" />
+              Add Team Member
+            </Link>
+          )}
           <Link
             href="/"
             target="_blank"
