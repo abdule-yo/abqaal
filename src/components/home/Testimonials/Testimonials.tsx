@@ -4,43 +4,40 @@ import { useState } from 'react'
 import { Sprout, Quote, ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
-const TESTIMONIALS = [
-  {
-    name: 'Fatima Hassan',
-    role: 'Farm Owner, Hargeisa',
-    quote:
-      'Abqaal transformed our small farm with modern drip irrigation and greenhouse technology. Our crop yield has tripled in just two seasons, and water usage dropped by 60%. Their team was with us every step of the way.',
-    rating: 5,
-  },
-  {
-    name: 'Ahmed Yusuf',
-    role: 'Director, HAVOYOCO',
-    quote:
-      'Working with Abqaal on our community farming project was exceptional. Their consulting expertise in soil analysis and crop planning helped us deliver lasting impact to over 300 farming families across three regions.',
-    rating: 5,
-  },
-  {
-    name: 'Sarah Mohamed',
-    role: 'Agricultural Officer, Boorame',
-    quote:
-      'The training programs Abqaal provides are world-class. Their hands-on approach to teaching modern farming techniques — from hydroponics to water conservation — has built real capacity in our farming communities.',
-    rating: 5,
-  },
-  {
-    name: 'Omar Abdi',
-    role: 'Investor, Livestock Sector',
-    quote:
-      'I trusted Abqaal with end-to-end management of my farm investment. Their expertise in livestock management and crop rotation planning has made the operation profitable well ahead of projections.',
-    rating: 5,
-  },
-]
+interface TestimonialItem {
+  name: string
+  role: string
+  quote: string
+  rating: number
+}
 
-export default function Testimonials() {
+interface TestimonialsProps {
+  testimonials?: TestimonialItem[]
+}
+
+export default function Testimonials({ testimonials }: TestimonialsProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const { ref, isIntersecting } = useIntersectionObserver({ threshold: 0.1 })
 
+  if (!testimonials || testimonials.length === 0) {
+    return (
+      <section id="testimonials" className="py-24 px-4 bg-[#FAFAF5]" ref={ref}>
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="h-14 w-14 rounded-2xl bg-[#4A8B2C]/10 flex items-center justify-center mx-auto mb-5">
+            <Quote className="h-7 w-7 text-[#4A8B2C]" />
+          </div>
+          <span className="block text-[13px] font-semibold text-[#4A8B2C] tracking-[0.2em] uppercase mb-4">
+            Testimonials
+          </span>
+          <h2 className="text-2xl font-extrabold text-[#1A1A17] mb-3">What Our Clients Say</h2>
+          <p className="text-[#1A1A17]/40 text-[15px]">Publishing soon — client stories are being collected.</p>
+        </div>
+      </section>
+    )
+  }
+
   const goTo = (index: number) => {
-    setActiveIndex((index + TESTIMONIALS.length) % TESTIMONIALS.length)
+    setActiveIndex((index + testimonials.length) % testimonials.length)
   }
 
   return (
@@ -87,7 +84,7 @@ export default function Testimonials() {
                   <ChevronRight className="h-5 w-5" />
                 </button>
                 <span className="ml-3 text-sm text-[#1A1A17]/40 font-medium">
-                  {String(activeIndex + 1).padStart(2, '0')} / {String(TESTIMONIALS.length).padStart(2, '0')}
+                  {String(activeIndex + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
                 </span>
               </div>
             </div>
@@ -109,34 +106,34 @@ export default function Testimonials() {
 
                 {/* Stars */}
                 <div className="flex gap-1 mb-5">
-                  {Array.from({ length: TESTIMONIALS[activeIndex].rating }).map((_, i) => (
+                  {Array.from({ length: testimonials[activeIndex].rating }).map((_, i) => (
                     <Star key={i} className="h-5 w-5 fill-[#F5A623] text-[#F5A623]" />
                   ))}
                 </div>
 
                 {/* Quote text */}
                 <blockquote className="text-lg sm:text-xl text-[#1A1A17] leading-relaxed font-medium mb-8 min-h-[120px]">
-                  &ldquo;{TESTIMONIALS[activeIndex].quote}&rdquo;
+                  &ldquo;{testimonials[activeIndex].quote}&rdquo;
                 </blockquote>
 
                 {/* Author */}
                 <div className="flex items-center gap-4 pt-6 border-t border-[#E8F5E9]">
                   <div className="h-12 w-12 rounded-full bg-[#4A8B2C] flex items-center justify-center text-white font-bold text-lg">
-                    {TESTIMONIALS[activeIndex].name.charAt(0)}
+                    {testimonials[activeIndex].name.charAt(0)}
                   </div>
                   <div>
                     <div className="font-bold text-[#1A1A17]">
-                      {TESTIMONIALS[activeIndex].name}
+                      {testimonials[activeIndex].name}
                     </div>
                     <div className="text-sm text-[#1A1A17]/50">
-                      {TESTIMONIALS[activeIndex].role}
+                      {testimonials[activeIndex].role}
                     </div>
                   </div>
                 </div>
 
                 {/* Dot indicators */}
                 <div className="flex gap-2 mt-6">
-                  {TESTIMONIALS.map((_, i) => (
+                  {testimonials.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setActiveIndex(i)}

@@ -46,20 +46,17 @@ export default function GalleryMarquee() {
   }))
 
   return (
-    <section id="gallery-marquee" className="py-24 overflow-hidden bg-white">
+    <section id="gallery-marquee" className="py-28 sm:py-36 overflow-hidden bg-[#FAFAF5]">
       <div
         ref={ref}
         className={`text-center mb-14 px-4 transition-all duration-700 ease-out ${
           isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
-        <div className="inline-flex items-center gap-2 mb-4">
-          <Sprout className="h-5 w-5 text-[#4A8B2C]" />
-          <span className="text-sm font-semibold text-[#4A8B2C] tracking-wide">
-            Agro Solutions
-          </span>
-        </div>
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1A1A17] leading-[1.08] tracking-tight">
+        <span className="block text-[13px] font-semibold text-[#4A8B2C] tracking-[0.2em] uppercase mb-4">
+          Agro Solutions
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A17] leading-[1.1] tracking-tight">
           Caring for the Land,
           <br />
           Growing for Life

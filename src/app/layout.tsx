@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://abqaal.com'),
@@ -67,34 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Abqaal Agricultural Consulting Firm',
-              url: 'https://abqaal.com',
-              logo: 'https://abqaal.com/logo.png',
-              description: 'Specialist agribusiness consulting firm providing advanced agro-tech solutions across the Horn of Africa.',
-              address: {
-                '@type': 'PostalAddress',
-                addressLocality: 'Hargeisa',
-                addressCountry: 'Somaliland',
-              },
-              contactPoint: {
-                '@type': 'ContactPoint',
-                telephone: '+252-63-4234817',
-                contactType: 'customer service',
-                email: 'abqaalconsulting@gmail.com',
-              },
-              sameAs: [],
-            }),
-          }}
-        />
-        <Navbar />
         {children}
-        <Footer />
       </body>
     </html>
   )

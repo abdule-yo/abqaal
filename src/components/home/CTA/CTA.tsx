@@ -46,7 +46,7 @@ export default function CTA() {
     <section
       id="faq"
       ref={ref}
-      className="relative py-24 px-4 bg-[#1B5E20] overflow-hidden"
+      className="relative py-28 sm:py-36 px-4 bg-[#1B5E20] overflow-hidden"
     >
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.03]">
@@ -69,10 +69,10 @@ export default function CTA() {
                 isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
-              <span className="text-sm font-semibold text-[#C5E84D] tracking-wide mb-4 block">
+              <span className="block text-[13px] font-semibold text-[#C5E84D] tracking-[0.2em] uppercase mb-5">
                 FAQ&apos;s
               </span>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-white leading-[1.08] tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-[1.1] tracking-tight mb-6">
                 Frequently
                 <br />
                 Asked

@@ -5,44 +5,17 @@ import Image from 'next/image'
 import { Sprout, Expand } from 'lucide-react'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
-const GALLERY_ITEMS = [
-  {
-    src: '/gallery/gallery-1.jpg',
-    alt: 'Greenhouse installation in Hargeisa',
-    category: 'Greenhouse',
-    span: 'row-span-2',
-  },
-  {
-    src: '/gallery/gallery-2.jpg',
-    alt: 'Drip irrigation system setup',
-    category: 'Irrigation',
-    span: '',
-  },
-  {
-    src: '/gallery/gallery-3.jpg',
-    alt: 'Farm training session with local farmers',
-    category: 'Training',
-    span: '',
-  },
-  {
-    src: '/gallery/gallery-4.jpg',
-    alt: 'Crop yield field inspection',
-    category: 'Field Work',
-    span: '',
-  },
-  {
-    src: '/gallery/gallery-5.jpg',
-    alt: 'Soil analysis and testing on-site',
-    category: 'Research',
-    span: 'row-span-2',
-  },
-  {
-    src: '/gallery/gallery-6.jpg',
-    alt: 'Harvesting fresh vegetables',
-    category: 'Harvest',
-    span: '',
-  },
-]
+interface GalleryItem {
+  id?: string
+  image_url?: string
+  alt_text?: string
+  category: string
+  sort_order?: number
+}
+
+interface ProjectsShowcaseProps {
+  galleryItems?: GalleryItem[]
+}
 
 const PLACEHOLDER_COLORS = [
   'from-[#2D6A2E] to-[#4A8B2C]',
@@ -53,13 +26,39 @@ const PLACEHOLDER_COLORS = [
   'from-[#2D6A2E] to-[#1B5E20]',
 ]
 
-export default function ProjectsShowcase() {
+const SPAN_PATTERN = ['row-span-2', '', '', '', 'row-span-2', '']
+
+export default function ProjectsShowcase({ galleryItems }: ProjectsShowcaseProps) {
   const { ref, isIntersecting } = useIntersectionObserver({ threshold: 0.05 })
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
+  if (!galleryItems || galleryItems.length === 0) {
+    return (
+      <section id="gallery" className="py-28 sm:py-36 px-4 bg-white" ref={ref}>
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="h-14 w-14 rounded-2xl bg-[#E8F5E9] flex items-center justify-center mx-auto mb-5">
+            <Sprout className="h-7 w-7 text-[#4A8B2C]" strokeWidth={1.5} />
+          </div>
+          <span className="block text-[13px] font-semibold text-[#4A8B2C] tracking-[0.2em] uppercase mb-4">
+            Our Gallery
+          </span>
+          <h2 className="text-2xl font-extrabold text-[#1A1A17] mb-3">From the Field</h2>
+          <p className="text-[#1A1A17]/40 text-[15px]">Publishing soon — gallery photos are being curated.</p>
+        </div>
+      </section>
+    )
+  }
+
+  const items = galleryItems.map((item, i) => ({
+    src: item.image_url || '',
+    alt: item.alt_text || '',
+    category: item.category,
+    span: SPAN_PATTERN[i % SPAN_PATTERN.length] || '',
+  }))
+
   return (
     <>
-      <section id="gallery" className="py-24 px-4 bg-white" ref={ref}>
+      <section id="gallery" className="py-28 sm:py-36 px-4 bg-white" ref={ref}>
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-14">
@@ -68,13 +67,10 @@ export default function ProjectsShowcase() {
                 isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
-              <div className="inline-flex items-center gap-2 mb-4">
-                <Sprout className="h-5 w-5 text-[#4A8B2C]" />
-                <span className="text-sm font-semibold text-[#4A8B2C] tracking-wide">
-                  Our Gallery
-                </span>
-              </div>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1A1A17] leading-[1.08] tracking-tight mb-4">
+              <span className="block text-[13px] font-semibold text-[#4A8B2C] tracking-[0.2em] uppercase mb-4">
+                Our Gallery
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1A1A17] leading-[1.1] tracking-tight mb-4">
                 From the Field
               </h2>
               <p className="text-[#1A1A17]/50 text-base max-w-lg mx-auto">
@@ -86,7 +82,7 @@ export default function ProjectsShowcase() {
 
           {/* Masonry Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[220px] sm:auto-rows-[260px] gap-4">
-            {GALLERY_ITEMS.map((item, index) => (
+            {items.map((item, index) => (
               <div
                 key={index}
                 className={`group relative rounded-2xl overflow-hidden cursor-pointer ${item.span} transition-all duration-700 ease-out ${
@@ -97,23 +93,25 @@ export default function ProjectsShowcase() {
                 style={{ transitionDelay: `${200 + index * 100}ms` }}
                 onClick={() => setLightboxIndex(index)}
               >
-                {/* Placeholder gradient — will be replaced by real images */}
+                {/* Placeholder gradient */}
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${PLACEHOLDER_COLORS[index]} transition-transform duration-700 group-hover:scale-105`}
+                  className={`absolute inset-0 bg-gradient-to-br ${PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length]} transition-transform duration-700 group-hover:scale-105`}
                 />
 
-                {/* Image (will load when real files exist) */}
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105 relative z-[1]"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  onError={(e) => {
-                    const target = e.currentTarget
-                    target.style.display = 'none'
-                  }}
-                />
+                {/* Image */}
+                {item.src && (
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105 relative z-[1]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    onError={(e) => {
+                      const target = e.currentTarget
+                      target.style.display = 'none'
+                    }}
+                  />
+                )}
 
                 {/* Placeholder text when no image */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80 z-[0]">
@@ -150,32 +148,33 @@ export default function ProjectsShowcase() {
         >
           <div className="relative max-w-4xl w-full aspect-[16/10] rounded-2xl overflow-hidden">
             <div
-              className={`absolute inset-0 bg-gradient-to-br ${PLACEHOLDER_COLORS[lightboxIndex]}`}
+              className={`absolute inset-0 bg-gradient-to-br ${PLACEHOLDER_COLORS[lightboxIndex % PLACEHOLDER_COLORS.length]}`}
             />
-            <Image
-              src={GALLERY_ITEMS[lightboxIndex].src}
-              alt={GALLERY_ITEMS[lightboxIndex].alt}
-              fill
-              className="object-cover relative z-[1]"
-              sizes="90vw"
-              onError={(e) => {
-                const target = e.currentTarget
-                target.style.display = 'none'
-              }}
-            />
+            {items[lightboxIndex].src && (
+              <Image
+                src={items[lightboxIndex].src}
+                alt={items[lightboxIndex].alt}
+                fill
+                className="object-cover relative z-[1]"
+                sizes="90vw"
+                onError={(e) => {
+                  const target = e.currentTarget
+                  target.style.display = 'none'
+                }}
+              />
+            )}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/60 z-[0]">
               <Sprout className="h-16 w-16 mb-4 opacity-30" strokeWidth={1} />
               <span className="text-sm font-medium opacity-50">
-                {GALLERY_ITEMS[lightboxIndex].alt}
+                {items[lightboxIndex].alt}
               </span>
-              <span className="text-xs mt-2 opacity-30">Image coming soon</span>
             </div>
             <div className="absolute bottom-6 left-6 z-[2]">
               <span className="inline-block px-4 py-1.5 bg-[#C5E84D] text-[#1A1A17] text-sm font-semibold rounded-full">
-                {GALLERY_ITEMS[lightboxIndex].category}
+                {items[lightboxIndex].category}
               </span>
               <p className="text-white text-lg font-semibold mt-2">
-                {GALLERY_ITEMS[lightboxIndex].alt}
+                {items[lightboxIndex].alt}
               </p>
             </div>
           </div>

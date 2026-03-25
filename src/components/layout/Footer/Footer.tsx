@@ -99,6 +99,12 @@ export default function Footer() {
             >
               Privacy Policy
             </Link>
+            <Link
+              href="/login"
+              className="text-sm text-white/20 hover:text-white/45 transition-colors duration-300"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </div>

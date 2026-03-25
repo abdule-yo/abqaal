@@ -98,25 +98,22 @@ export default function ServicesOverview() {
   const [activeId, setActiveId] = useState<string | null>(null)
 
   return (
-    <section id="services" className="py-24 px-4 bg-[#FAFAF5] overflow-hidden">
+    <section id="services" className="py-28 sm:py-36 px-4 bg-[#FAFAF5] overflow-hidden">
       <div className="max-w-7xl mx-auto" ref={ref}>
         {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
           <div
             className={`transition-all duration-700 ease-out ${
               isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            <div className="inline-flex items-center gap-2 mb-4">
-              <Sprout className="h-5 w-5 text-[#4A8B2C]" />
-              <span className="text-sm font-semibold text-[#4A8B2C] tracking-wide">
-                What We Do
-              </span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1A1A17] leading-[1.08] tracking-tight">
-              Five Divisions,
+            <span className="block text-[13px] font-semibold text-[#4A8B2C] tracking-[0.2em] uppercase mb-4">
+              What We Do
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-[#1A1A17] leading-[1.1] tracking-tight">
+              Five divisions,
               <br />
-              One Mission
+              one mission
             </h2>
           </div>
 
@@ -126,13 +123,13 @@ export default function ServicesOverview() {
             }`}
             style={{ transitionDelay: '200ms' }}
           >
-            <p className="text-[#1A1A17]/60 max-w-md text-base leading-relaxed mb-5">
+            <p className="text-[#1A1A17]/50 max-w-md text-[15px] leading-[1.7] mb-6">
               From seed procurement to post-harvest advisory — we provide
               the full spectrum of agricultural services across the Horn of Africa.
             </p>
             <Link
               href="/services"
-              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white font-semibold text-sm rounded-full transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-[#4A8B2C]/25"
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#4A8B2C] hover:bg-[#1B5E20] text-white font-semibold text-[15px] rounded-full transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-[#4A8B2C]/25"
             >
               All Services
               <ArrowUpRight className="h-4 w-4" />
