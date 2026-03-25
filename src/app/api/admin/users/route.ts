@@ -2,17 +2,57 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 
-// Admin API using service role key to create auth users
+// Admin client with service role key — bypasses RLS
 function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !serviceKey) {
+    throw new Error(
+      `Missing env vars: ${!url ? 'NEXT_PUBLIC_SUPABASE_URL ' : ''}${!serviceKey ? 'SUPABASE_SERVICE_ROLE_KEY' : ''}`
+    )
+  }
+
   return createClient(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
 }
 
+/**
+ * Check if the current user is a super_admin.
+ * If the admin_users table is empty, auto-seed the current user as the first super_admin.
+ */
+async function verifySuperAdmin(userId: string, userEmail: string) {
+  const adminClient = createAdminClient()
+
+  // Check if admin_users table has ANY rows
+  const { count } = await adminClient
+    .from('admin_users')
+    .select('*', { count: 'exact', head: true })
+
+  // If table is empty, auto-seed this user as the first super_admin
+  if (count === 0) {
+    await adminClient.from('admin_users').insert({
+      user_id: userId,
+      email: userEmail,
+      name: userEmail.split('@')[0],
+      role: 'super_admin',
+    })
+    return true
+  }
+
+  // Otherwise, check if user exists and is super_admin (using service role to bypass RLS)
+  const { data: callerAdmin } = await adminClient
+    .from('admin_users')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  return callerAdmin?.role === 'super_admin'
+}
+
 export async function POST(request: NextRequest) {
-  // 1. Verify the caller is a super_admin
+  // 1. Get current authenticated user
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -20,17 +60,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const { data: callerAdmin } = await supabase
-    .from('admin_users')
-    .select('role')
-    .eq('user_id', user.id)
-    .single()
+  // 2. Verify super_admin (auto-seeds first user)
+  const isSuperAdmin = await verifySuperAdmin(user.id, user.email ?? '')
 
-  if (!callerAdmin || callerAdmin.role !== 'super_admin') {
+  if (!isSuperAdmin) {
     return NextResponse.json({ error: 'Only super admins can create users' }, { status: 403 })
   }
 
-  // 2. Parse request body
+  // 3. Parse request body
   const body = await request.json()
   const { email, password, name, role } = body as {
     email: string
@@ -47,8 +84,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
   }
 
-  // 3. Create auth user with service role
-  const adminClient = createAdminClient()
+  // 4. Create auth user with service role
+  let adminClient
+  try {
+    adminClient = createAdminClient()
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 })
+  }
+
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
     email,
     password,
@@ -56,10 +99,14 @@ export async function POST(request: NextRequest) {
   })
 
   if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 400 })
+    console.error('Supabase auth.admin.createUser error:', authError)
+    return NextResponse.json(
+      { error: `Failed to create auth user: ${authError.message}` },
+      { status: 400 }
+    )
   }
 
-  // 4. Create admin_users record (using service role to bypass RLS for the initial insert)
+  // 5. Create admin_users record (service role bypasses RLS)
   const { error: profileError } = await adminClient
     .from('admin_users')
     .insert({
@@ -87,13 +134,9 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const { data: callerAdmin } = await supabase
-    .from('admin_users')
-    .select('role')
-    .eq('user_id', user.id)
-    .single()
+  const isSuperAdmin = await verifySuperAdmin(user.id, user.email ?? '')
 
-  if (!callerAdmin || callerAdmin.role !== 'super_admin') {
+  if (!isSuperAdmin) {
     return NextResponse.json({ error: 'Only super admins can delete users' }, { status: 403 })
   }
 
@@ -110,10 +153,8 @@ export async function DELETE(request: NextRequest) {
 
   const adminClient = createAdminClient()
 
-  // Delete admin_users record (cascade from auth.users will handle this too)
   await adminClient.from('admin_users').delete().eq('user_id', targetUserId)
 
-  // Delete the auth user
   const { error } = await adminClient.auth.admin.deleteUser(targetUserId)
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 })

@@ -42,7 +42,8 @@ ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "admin_users_auth_read" ON admin_users
   FOR SELECT TO authenticated USING (true);
 
--- Only super_admins can insert new admin users
+-- Super_admins can insert new admin users.
+-- Also allow insert when the table is empty (first user auto-seeds as super_admin).
 CREATE POLICY "admin_users_super_insert" ON admin_users
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -50,6 +51,7 @@ CREATE POLICY "admin_users_super_insert" ON admin_users
       SELECT 1 FROM admin_users
       WHERE user_id = auth.uid() AND role = 'super_admin'
     )
+    OR NOT EXISTS (SELECT 1 FROM admin_users)
   );
 
 -- Only super_admins can update admin users

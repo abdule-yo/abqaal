@@ -13,7 +13,8 @@ export interface CurrentAdmin {
 
 /**
  * Get the current authenticated user's admin profile + role.
- * Returns null if not found in admin_users table.
+ * If the admin_users table is empty, auto-seeds the current user as the first super_admin.
+ * If the user exists in auth but not in admin_users, returns a default editor profile.
  */
 export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   try {
@@ -21,20 +22,58 @@ export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
+    // Try to get admin profile
     const { data, error } = await supabase
       .from('admin_users')
       .select('*')
       .eq('user_id', user.id)
       .single()
 
-    if (error || !data) return null
+    if (!error && data) {
+      const admin = data as AdminUser
+      return {
+        userId: admin.user_id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+      }
+    }
 
-    const admin = data as AdminUser
+    // User not in admin_users — check if the table is empty (first user gets auto-seeded)
+    const { count } = await supabase
+      .from('admin_users')
+      .select('*', { count: 'exact', head: true })
+
+    if (count === 0) {
+      // Auto-seed as first super_admin
+      const { data: newAdmin } = await supabase
+        .from('admin_users')
+        .insert({
+          user_id: user.id,
+          email: user.email ?? '',
+          name: user.email?.split('@')[0] ?? '',
+          role: 'super_admin' as AdminRole,
+        })
+        .select()
+        .single()
+
+      if (newAdmin) {
+        const seeded = newAdmin as AdminUser
+        return {
+          userId: seeded.user_id,
+          email: seeded.email,
+          name: seeded.name,
+          role: seeded.role,
+        }
+      }
+    }
+
+    // Authenticated but no admin_users row — treat as editor
     return {
-      userId: admin.user_id,
-      email: admin.email,
-      name: admin.name,
-      role: admin.role,
+      userId: user.id,
+      email: user.email ?? '',
+      name: user.email?.split('@')[0] ?? '',
+      role: 'editor',
     }
   } catch {
     return null
